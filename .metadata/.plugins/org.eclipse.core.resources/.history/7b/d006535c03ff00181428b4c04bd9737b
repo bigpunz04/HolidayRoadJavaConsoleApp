@@ -1,0 +1,49 @@
+import java.sql.*;
+
+public class timeOffLinkedList {
+	private timeOffNode m_first;
+	private int count;
+
+	public timeOffLinkedList() {
+		m_first = null;
+	}
+	public void insertTimeOffRequest(int reqID, String dateRequested, int empID, int timeOffTypeID, char decision, String startDate,
+		String endDate, int totalDaysOff, String notes){
+		
+		timeOffNode newNode = new timeOffNode(reqID, dateRequested, empID, timeOffTypeID, decision, startDate, endDate, totalDaysOff, notes); 
+		
+		timeOffNode current = m_first;
+		timeOffNode previous = null;
+		
+		while(current != null) {
+			if(current.getReqID() < reqID) {
+				previous = current;
+				current = current.getLink();
+			}else break;
+		}
+		
+		if(previous == null) {
+			newNode.setLink(current);
+			m_first = newNode;
+		}else {
+			newNode.setLink(current);
+			previous.setLink(newNode);
+		}
+		
+	}
+	
+	public void displayList() {
+		timeOffNode current = m_first;
+		System.out.println("Here3");
+		while(current != null) {
+			System.out.println("Here2");
+			System.out.println(current.getEmpID() + " " + current.getTimeOffTypeID());
+			current = current.getLink();
+		}
+	}
+	
+	
+	
+	
+	
+}

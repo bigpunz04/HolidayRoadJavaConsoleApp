@@ -1,0 +1,46 @@
+create TABLE v2hrEmployee(
+    empID int,
+    empPassword varchar(25),
+    empFirst varchar(25),
+    empLast varchar(25),
+    empDept varchar(25),
+    empTitle varchar(25),
+    empType varchar(1),
+    empVacationHours decimal(3, 1),
+    PRIMARY KEY(empID)
+)
+
+create table v2hrTimeOffRequests(
+	reqID int Auto_increment,
+	dateRequested varchar(10),
+	empID int,
+	timeOffTypeId int,
+	decision varchar(1),
+	startDate varchar(10),
+	endDate varchar(10),
+	todayDaysOff int,
+	foreign key(empID) references v2hrEmployee(empID),
+	foreign key(timeOffTypeId) references v2hrTimeOffTypes(timeOffTypeId),
+	primary key(reqId)
+)
+
+create table v3hrTimeOffRequest(
+	reqId int
+
+alter table v2hrTimeOffRequests
+add Notes varchar(150)
+
+create table v2hrTimeOffTypes(
+	timeOffTypeId int auto_increment,
+	timeOffDescription varchar(150),
+	primary key(timeOffTypeId)
+)
+	
+
+INSERT INTO v2hrTimeOffRequests (dateRequested, empID, timeOffTypeId, decision, startDate, endDate, todayDaysOff, Notes) VALUES
+('12-12-2018', 1001, 1, 'A', '12-12-2018', '12-14-2018', 2, 'Going to L.A.'),
+('12-12-2018', 1002, 2, 'D', '12-20-2018', '12-25-2018', 5, 'Floida getaway')
+
+INSERT into v2hrTimeOffTypes (timeOffDescription) VALUES ('Vacation Time'), ('Sick Time'), ('Unpaid Time'), ('Bereavement'), ('Jury Duty')
+
+CREATE VIEW timeOffRequestsView AS SELECT v2hrEmployee.empFirst, v2hrEmployee.empLast, v2hrTimeOffRequests.* FROM v2hrEmployee LEFT JOIN v2hrTimeOffRequests ON v2hrEmployee.empID = v2hrTimeOffRequests.empID 

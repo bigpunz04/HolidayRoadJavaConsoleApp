@@ -1,0 +1,163 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List; 
+import java.sql.*;
+import java.io.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class MySQLConnection {
+
+	private String sqlStatement;
+	private Statement stmt;
+	
+	public empLL empListing = new empLL();
+	
+	
+	public MySQLConnection() {
+		this.sqlStatement = "jdbc:mysql://cs.neiu.edu:3306/18f315_Rhein?" + "user=18f315_Rhein&password=Reesey1015!";
+		openConnection();
+	}
+	
+	//CALLED FROM SUPER() ONLY!!!!
+	//OBTAINS INFO FROM THE DB AND THEN CREATES A LINKED LIST BASED ON 
+	public void openConnection() {
+		try {
+			Connection conn = null;
+            conn = DriverManager.getConnection(this.sqlStatement);
+            this.stmt = conn.createStatement();
+            int i = 1;
+            ResultSet listing = this.stmt.executeQuery("SELECT * FROM v2hrEmployee");
+   
+            while(listing.next()) {
+            	
+            	int empID = listing.getInt("empID");
+                String empPassword = listing.getString("empPassword");
+                String empFirst = listing.getString("empFirst");
+                String empLast = listing.getString("empLast");
+                String empDepartment = listing.getString("empDept");
+                String empTitle = listing.getString("empTitle");
+                char empType = listing.getString("empType").charAt(0);
+                double empVacationHours = listing.getDouble("empVacationHours");
+                
+                //CREATE A NODE.
+                empListing.insertEmployee(empID, empPassword, empFirst, empLast, empDepartment, empTitle, empType, empVacationHours);
+                
+            }
+		}
+		catch(SQLException ex){
+            // handle any errors
+            System.out.println("SQLException: " + ex.getMessage());
+            System.out.println("SQLState: " + ex.getSQLState());
+            System.out.println("VendorError: " + ex.getErrorCode());
+         }
+
+	}
+	
+	//CALLED FROM hrEmployee getTimeOffUsed()
+	//Will return to hrEmployee a double of the hours used based on Approved Time Off
+	
+	public double timeUsed(int id) {
+		
+		int totalDays = 0;
+		try{
+			Connection conn = null;
+	            conn = DriverManager.getConnection(this.sqlStatement);
+	            this.stmt = conn.createStatement();
+	            int i = 1;
+	            ResultSet listing = this.stmt.executeQuery("SELECT * FROM v2hrTimeOffRequests where empID = " + id + " AND (decision = 'A' OR decision = 'a')");
+	            while(listing.next()) {
+	            	totalDays += listing.getInt("totalDaysOff");
+	            }
+			}
+			catch(SQLException ex){
+	            // handle any errors
+	            System.out.println("SQLException: " + ex.getMessage());
+	            System.out.println("SQLState: " + ex.getSQLState());
+	            System.out.println("VendorError: " + ex.getErrorCode());
+			};
+		return totalDays * 8;
+	}
+	
+	public String timeOffTypes() {
+		String timeOffListing = "";
+		try{
+			Connection conn = null;
+	            conn = DriverManager.getConnection(this.sqlStatement);
+	            this.stmt = conn.createStatement();
+	            int i = 1;
+	            ResultSet listing = this.stmt.executeQuery("SELECT * FROM v2hrTimeOffTypes");
+	            while(listing.next()) {
+	            	timeOffListing += "  " + listing.getInt("timeOffTypeId") + ": " + listing.getString("timeOffDescription") + "\n";
+	            }
+			}
+			catch(SQLException ex){
+	            // handle any errors
+	            System.out.println("SQLException: " + ex.getMessage());
+	            System.out.println("SQLState: " + ex.getSQLState());
+	            System.out.println("VendorError: " + ex.getErrorCode());
+			}
+		
+		return timeOffListing;
+	}
+	
+	public void insertTime(String currentDate, int empID, int timeOffID, String startDate, String endDate, int totalDays, String note) {
+		String insertStmt = "INSERT INTO v2hrTimeOffRequests (dateRequested, empID, timeOffTypeId, startDate, endDate, totalDaysOff, Notes) VALUES('" + currentDate + "', " + empID + ", " + timeOffID + ", '" + startDate + "', '" + endDate + "', " + totalDays + ", '" + note + "')";
+		try{
+			Connection conn = null;
+			conn = DriverManager.getConnection(this.sqlStatement);
+			this.stmt = conn.createStatement();
+			stmt.executeUpdate(insertStmt);
+		}
+		 catch(SQLException ex){
+			// handle any errors
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+	}
+	
+	public void insertJuryTime(String currentDate, int empID, int timeOffID, String startDate, String note) {
+		String insertStmt = "INSERT INTO v2hrTimeOffRequests (dateRequested, empID, timeOffTypeId, startDate, Notes) VALUES('" + currentDate + "', " + empID + ", " + timeOffID + ", '" + startDate + "', '" + note + "')";
+		try{
+			Connection conn = null;
+			conn = DriverManager.getConnection(this.sqlStatement);
+			this.stmt = conn.createStatement();
+			stmt.executeUpdate(insertStmt);
+		}
+		 catch(SQLException ex){
+			// handle any errors
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
+		}
+	}
+	
+	
+	//SETTERS AND GETTERS
+	public Statement getStatement() {
+		return this.stmt;
+	}
+	
+}
+
+
+/*
+ * 
+ try{
+	Connection conn = null;
+	conn = DriverManager.getConnection(this.sqlStatement);
+	this.stmt = conn.createStatement();
+	int i = 1;
+	ResultSet listing = this.stmt.executeQuery("SELECT * FROM v2hrEmployee");
+}
+ catch(SQLException ex){
+	// handle any errors
+	System.out.println("SQLException: " + ex.getMessage());
+	System.out.println("SQLState: " + ex.getSQLState());
+	System.out.println("VendorError: " + ex.getErrorCode());
+}
+ * 
+ * 
+ * 
+*/

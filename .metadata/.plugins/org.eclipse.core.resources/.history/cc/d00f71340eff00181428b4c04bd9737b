@@ -1,0 +1,152 @@
+
+import java.sql.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Scanner;
+import java.util.*;
+
+public class HolidayRoadv1 {
+
+	public static void main(String[] args) {
+		
+		//CREATE MYSQL CONNECTION
+		MySQL2 sqlConn = new MySQL2();
+		
+		//GET EMPLOYEE DIRECTORY
+		String empDirectory = "SELECT * FROM v2hrEmployees";
+		empLL employeeDirectory = sqlConn.getDirectory(empDirectory);
+		
+		//CREATE DATE OBJECT AND GET CURRENT DATE
+		LocalDate localDate = LocalDate.now();
+		String currentDate = DateTimeFormatter.ofPattern("MM-dd-yyyy").format(localDate) + "";
+		
+		//SQL CONNECT STATUS
+		System.out.println("MySQL Connection Succesful: " + currentDate);
+		System.out.println("HolidayRoad v1.0");
+		System.out.println("By: Rhein Punzalan");
+		System.out.println();
+		
+		//WELCOME MESSAGE AND EMPLOYEE CREATION
+		System.out.println("************************************************");
+		System.out.println("Welcome to HOLIDAY ROAD - Where Time Off Begins!");
+		System.out.println("************************************************");
+		System.out.println();
+		System.out.println();
+		System.out.println("*********************************************************************");
+		System.out.println("Enter your 4 Digit Employee ID or enter a '-1' to view the directory.");
+		System.out.println();
+		int id = getNumInput();
+		System.out.println("*********************************************************************");
+		System.out.println();
+		System.out.println();	
+		
+		//CREATE A NEW EMPLOYEE OBJECT AND SET IT TO NULL.
+		//THIS OBJECT WILL BE POPULATED WITH THE OBJECT DETAILS IN THE WHILE LOOP
+		hrEmployee thisEmployee = null;
+		
+		boolean empFound = false;
+		while(!empFound) {
+			
+			if(id == -1) {
+				System.out.println();
+				System.out.println("EMPLOYEE DIRECTORY");
+				System.out.println();
+				employeeDirectory.displayList();
+				System.out.println("If you do not see your Employee ID, you will need to be added by an employee with a title of 'Manager'.");
+				System.out.println();
+				id = getNumInput();
+			}else if(employeeDirectory.contains(id)){
+				//GET THE NODE FOR THE EMPLOYEE ID THAT WAS ENTERED IN THE SYSTEM
+				//CREATE AN OBJECT OF TYPE HREMPLOYEE
+				empNode empInfo = employeeDirectory.getEmpInfo(id);
+				thisEmployee = new hrEmployee(empInfo);
+				empFound = true;
+			}else{
+				System.out.println("**********************************************");
+				System.out.println("ID not found. Please try again.");
+				id = getNumInput();
+				System.out.println("**********************************************");
+				System.out.println();
+			}
+			System.out.println();
+		}
+		System.out.println("*********************************************************************");
+		System.out.println("Hello," + emp.getEmpFirst() + " " + emp.getEmpLast() + "!");
+		System.out.println("How are things going in the " + emp.getEmpDepartment() + " department?");
+		System.out.println();
+		System.out.println("What can I do for you today? ");
+		System.out.println();
+		/*
+		
+		
+		
+			
+			
+			
+		}
+		System.out.println("*********************************************************************");
+		System.out.println("Hello," + emp.getEmpFirst() + " " + emp.getEmpLast() + "!");
+		System.out.println("How are things going in the " + emp.getEmpDepartment() + " department?");
+		System.out.println();
+		System.out.println("What can I do for you today? ");
+		System.out.println();
+		while(true) {
+			System.out.println();
+			System.out.println("MAIN MENU");
+			System.out.println();
+			if(emp.getEmpTitle().equals("Manager")) {
+				System.out.println("  1: Request Time Off");
+				System.out.println("  2: View Time Off History");
+				System.out.println("  3: Approve/Decline Time Off Requests");
+				System.out.println();
+				System.out.println(" -1. Close the application");
+				System.out.println();
+			}else {
+				System.out.println(" 1: Request Time Off");
+				System.out.println(" 2: View Time Off History");
+				System.out.println();
+				System.out.println("-1: Close the application");
+				System.out.println();
+			}
+			
+			int menu_select = getNumInput();
+			if(menu_select == -1) {
+				break;
+			}else if(menu_select == 1) {
+				emp.requestTimeOff(currentDate, sqlConn);
+			}else if(menu_select == 2) {
+				emp.viewHistory(currentDate, sqlConn);
+			}
+		}
+		
+		System.out.println();
+		System.out.println();
+		System.out.println("********************************");
+		System.out.println("Thank you for using Holiday Road");
+		System.out.println("Goodbye!");
+		System.out.println("********************************");
+		
+*/
+	}
+	
+	//CHECK IF THE ENTERED VALUE IS A NUMBER
+	public static int getNumInput() {
+		
+		Scanner input = new Scanner(System.in);
+		int userInput;
+		while(true) {
+			try {
+				System.out.print("Selection: ");
+				userInput = input.nextInt();
+				return userInput;
+			}
+			catch(InputMismatchException e) {
+				System.out.println("You did not enter a number.  Please try again.");
+				input.next();
+			}
+		}
+	
+	}
+	
+
+}

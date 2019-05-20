@@ -1,0 +1,146 @@
+import java.util.InputMismatchException;
+import java.util.Scanner;
+import java.text.DecimalFormat;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.Scanner;
+import org.joda.time.Days;
+import org.joda.time.LocalDate;
+import org.joda.time.DateTime;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+public class hrEmployee2 {
+	private int empID;
+	private String empPassword;
+	private String empFirst;
+	private String empLast;
+	private String empDepartment;
+	private String empTitle;
+	private char empType;
+	private double empVacationHours;
+	private MySQL2 connection;
+	
+	DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
+	
+	//COMES FROM main().  
+	//USED ONLY IF EMPLOYEE EXISTS IN THE DB
+	public hrEmployee2(empNode emp, MySQL2 sqlConn){
+		   
+	      this.empID = emp.getEmpID();
+	      this.empPassword = emp.getEmpPassword();
+	      this.empFirst = emp.getEmpFirst();
+	      this.empLast = emp.getEmpLast();
+	      this.empDepartment = emp.getEmpDepartment();
+	      this.empTitle = emp.getEmpTitle();
+	      this.empType = emp.getEmpType();
+	      this.empVacationHours = emp.getEmpVacationHours();
+	      
+	      this.connection = sqlConn;
+	      
+	}
+	
+	public void requestTimeOff() {
+		System.out.println("test");
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	public int getEmpID() {
+		return empID;
+	}
+
+	public void setEmpID(int empID) {
+		this.empID = empID;
+	}
+
+	public String getEmpPassword() {
+		return empPassword;
+	}
+
+	public void setEmpPassword(String empPassword) {
+		this.empPassword = empPassword;
+	}
+
+	public String getEmpFirst() {
+		return empFirst;
+	}
+
+	public void setEmpFirst(String empFirst) {
+		this.empFirst = empFirst;
+	}
+
+	public String getEmpLast() {
+		return empLast;
+	}
+
+	public void setEmpLast(String empLast) {
+		this.empLast = empLast;
+	}
+
+	public String getEmpDepartment() {
+		return empDepartment;
+	}
+
+	public void setEmpDepartment(String empDepartment) {
+		this.empDepartment = empDepartment;
+	}
+
+	public String getEmpTitle() {
+		return empTitle;
+	}
+
+	public void setEmpTitle(String empTitle) {
+		this.empTitle = empTitle;
+	}
+
+	public char getEmpType() {
+		return empType;
+	}
+
+	public void setEmpType(char empType) {
+		this.empType = empType;
+	}
+
+	public double getEmpVacationHours() {
+		return empVacationHours;
+	}
+
+	public void setEmpVacationHours(double empVacationHours) {
+		this.empVacationHours = empVacationHours;
+	}
+}

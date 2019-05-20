@@ -1,0 +1,388 @@
+import java.util.InputMismatchException;
+import java.util.Scanner;
+import java.text.DecimalFormat;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.Scanner;
+import org.joda.time.Days;
+import org.joda.time.LocalDate;
+import org.joda.time.DateTime;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+public class hrEmployee {
+	private int empID;
+	private String empPassword;
+	private String empFirst;
+	private String empLast;
+	private String empDepartment;
+	private String empTitle;
+	private char empType;
+	private double empVacationHours;
+	
+	DateFormat df = new SimpleDateFormat("MM-dd-yyyy");
+	
+	//COMES FROM main().  
+	//USED ONLY IF EMPLOYEE EXISTS IN THE DB
+	public hrEmployee(empNode emp){
+		   
+	      this.empID = emp.getEmpID();
+	      this.empPassword = emp.getEmpPassword();
+	      this.empFirst = emp.getEmpFirst();
+	      this.empLast = emp.getEmpLast();
+	      this.empDepartment = emp.getEmpDepartment();
+	      this.empTitle = emp.getEmpTitle();
+	      this.empType = emp.getEmpType();
+	      this.empVacationHours = emp.getEmpVacationHours();
+	      
+	}
+	
+	public void requestTimeOff(String currentDate, MySQLConnection sqlConn) {
+		double hoursUsed = getTimeOffDetails(sqlConn);
+		System.out.println("MENU: Request Time Off" );
+		System.out.println();
+		System.out.println(sqlConn.timeOffTypes());
+		
+		System.out.println(" -1: Return to the main menu");
+		System.out.println();
+		
+		int selection = 0;
+		while(selection != -1) {
+			selection = getNumInput();
+			String start = "";
+			String end = "";
+			System.out.println();
+			
+			//Vacation Time
+			if(selection == 1) {
+				if(this.empType == 'f' || this.empType == 'F') {
+					System.out.println("*******************************************");
+					System.out.println("You have chosen to request vacation time.");
+					System.out.println();
+					int countDays;
+					while(true) {
+						System.out.print("Enter The Vacation Start Date (mm-dd-yyyy): ");
+						start = dateCheck();
+						System.out.println();
+						System.out.print("Enter The Vacation End Date (mm-dd-yyyy): ");
+						end = dateCheck();
+						countDays = dateDiff(start, end);
+						
+						if((countDays * 8) < (this.empVacationHours - (int)(hoursUsed))){
+							break;
+						}else {
+							System.out.println();
+							System.out.println("Unfortunately you do not have enough time left.  Select a shorter date range.");
+							System.out.println();
+						}
+					}
+					System.out.println();
+					String note = getNoteFromUser();
+					timeDetails(sqlConn, currentDate, this.empID, selection, start, end, countDays, note);
+					System.out.println();
+					System.out.println("Your request has been submitted." );
+					System.out.println("Your manager will be reviewing it shortly");
+					System.out.println();
+					System.out.println("*******************************************");
+					break;
+				}else System.out.println("As a part time employee, you are not qualified for vacation time.  Please select another option.");
+			}
+			
+			//SICK TIME
+			if(selection == 2) {
+				System.out.println("*******************************************");
+				System.out.println("You have chosen to request sick time.");
+				System.out.println();
+				System.out.print("Enter the date of your return (mm-dd-yyyy): ");
+				end = dateCheck();
+				String note = getNoteFromUser();
+				start = currentDate;
+				System.out.println();
+				int countDays = dateDiff(start, end);
+				timeDetails(sqlConn, currentDate, this.empID, selection, start, end, countDays, note);
+				System.out.println();
+				System.out.println("Your request has been submitted." );
+				System.out.println("Your manager will be reviewing it shortly");
+				System.out.println();
+				System.out.println("*******************************************");
+				break;
+			
+			//UNPAID TIME
+			}else if(selection == 3) {
+					System.out.println("*******************************************");
+					System.out.println("You have chosen to request unpaid time.");
+					System.out.println();
+					int countDays;
+					
+						System.out.print("Enter The Unpaid Time Start Date (mm-dd-yyyy): ");
+						start = dateCheck();
+						System.out.println();
+						System.out.print("Enter The Unpaid End Date (mm-dd-yyyy): ");
+						end = dateCheck();
+						countDays = dateDiff(start, end);
+					
+					System.out.println();
+					String note = getNoteFromUser();
+					timeDetails(sqlConn, currentDate, this.empID, selection, start, end, countDays, note);
+					System.out.println();
+					System.out.println("Your request has been submitted." );
+					System.out.println("Your manager will be reviewing it shortly");
+					System.out.println();
+					System.out.println("*******************************************");
+					break;
+				
+			//BEREAVEMENT	
+			}else if(selection == 4) {
+				System.out.println("*******************************************");
+				System.out.println("You have chosen to request Bereavement time.");
+				System.out.println();
+				int countDays;
+				
+					System.out.print("Enter The Bereavement Time Start Date (mm-dd-yyyy): ");
+					start = dateCheck();
+					System.out.println();
+					System.out.print("Enter The Bereavement Time End Date (mm-dd-yyyy): ");
+					end = dateCheck();
+					countDays = dateDiff(start, end);
+				
+				System.out.println();
+				String note = getNoteFromUser();
+				timeDetails(sqlConn, currentDate, this.empID, selection, start, end, countDays, note);
+				System.out.println();
+				System.out.println("Your request has been submitted." );
+				System.out.println("Your manager will be reviewing it shortly");
+				System.out.println();
+				System.out.println("*******************************************");
+				break;
+				
+			//Jury Duty
+			}else if(selection == 5) {
+				System.out.println("*******************************************");
+				System.out.println("You have chosen to request Jury Duty time.");
+				System.out.println();
+				
+					System.out.print("Enter The Jury Duty Time Start Date (mm-dd-yyyy): ");
+					start = dateCheck();
+					System.out.println();
+					
+				System.out.println();
+				String note = getNoteFromUser();
+				juryTimeDetails(sqlConn, currentDate, this.empID, selection, start, note);
+				System.out.println();
+				System.out.println("Your request has been submitted." );
+				System.out.println("Your manager will be reviewing it shortly");
+				System.out.println();
+				System.out.println("*******************************************");
+			}
+		}
+	}
+	
+	public void viewHistory(String currentDate, MySQLConnection sqlConn) {
+		System.out.println();
+		System.out.println("Detailed Time Off Report");
+		System.out.println();
+		getApprovedVacation(sqlConn);
+	}
+	
+	public void getApprovedVacation(MySQLConnection sqlConn) {
+		sqlConn.getTimeOffReqs();
+		timeOffLinkedList toLL = new timeOffLinkedList();
+		toLL.displayList();
+		System.out.println("Here1");
+	}
+	
+	public int dateDiff(String date1, String date2) {
+		
+		int count = 0;
+		try {
+			Date one = getDate(date1);
+			Date two = getDate(date2);
+			count = daysBetween(one, two);
+			
+		}
+		catch(ParseException e) {
+			e.printStackTrace();
+		}
+		
+		return count;
+	}
+	
+	
+	public int daysBetween(Date one, Date two) {
+		return Days.daysBetween(new LocalDate(one.getTime()), new LocalDate(two.getTime())).getDays();
+	}
+	
+	public Date getDate(String date) throws ParseException{
+		return df.parse(date);
+	}
+	
+	public void timeDetails(MySQLConnection sqlConn, String currentDate, int empID, int timeOffID, String startDate, String endDate, int totalDays, String note) {
+			sqlConn.insertTime(currentDate, empID, timeOffID, startDate, endDate, totalDays, note);
+	}
+	
+	public void juryTimeDetails(MySQLConnection sqlConn, String currentDate, int empID, int timeOffID, String startDate, String note) {
+		sqlConn.insertJuryTime(currentDate, empID, timeOffID, startDate, note);
+}
+	
+	public String getNoteFromUser() {
+		Scanner input = new Scanner(System.in);
+		System.out.print("Enter a short note about your request: ");
+		String s = input.nextLine();
+		return s;
+	}
+	
+	public String dateCheck() {
+		Scanner input = new Scanner(System.in);
+		boolean correctForm = false;
+		String s = "";
+		while(!correctForm) {
+			s = input.nextLine();
+			if(s.matches("^(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])-[0-9]{4}$")) {
+				correctForm = true;
+			}else {
+				System.out.println();
+				System.out.println("The date you entered did not match the required form");
+				System.out.print("Please enter the date as follows mm-dd-yyyy: ");
+			}
+		}
+		return s;
+	}
+	
+	public int getNumInput() {
+		Scanner input = new Scanner(System.in);
+		int userInput;
+		while(true) {
+			try {
+				System.out.print("Selection: ");
+				userInput = input.nextInt();
+				return userInput;
+			}
+			catch(InputMismatchException e) {
+				System.out.println("You did not enter a number.  Please try again.");
+				input.next();
+			}
+		}
+	}
+	
+	public double getTimeOffDetails(MySQLConnection sqlConn) {
+		double usedTime = getTimeApprovedUsed(this.empID, sqlConn);
+		System.out.println();
+		System.out.println("TIME OFF DETAILS FOR " + this.empFirst + " " + this.empLast);
+		System.out.println();
+		System.out.println("********************************************************");
+		System.out.println("Total Time Off Hours: " + this.empVacationHours + " hours");
+		System.out.println("Total Time Off Used: " + usedTime  + " hours");
+		System.out.println("Total Time Off Remaining: " + (this.empVacationHours - usedTime) + " hours");
+		System.out.println("********************************************************");
+		System.out.println();
+		
+		return usedTime;
+	}
+	
+	//called from hrEmployee getTimeOffDetials
+	//returns a double that represents all time off request that was approved
+	public double getTimeApprovedUsed(int id, MySQLConnection sqlConn) {
+		
+		return sqlConn.timeUsed(id);
+	}
+
+	public int getEmpID() {
+		return empID;
+	}
+
+	public void setEmpID(int empID) {
+		this.empID = empID;
+	}
+
+	public String getEmpPassword() {
+		return empPassword;
+	}
+
+	public void setEmpPassword(String empPassword) {
+		this.empPassword = empPassword;
+	}
+
+	public String getEmpFirst() {
+		return empFirst;
+	}
+
+	public void setEmpFirst(String empFirst) {
+		this.empFirst = empFirst;
+	}
+
+	public String getEmpLast() {
+		return empLast;
+	}
+
+	public void setEmpLast(String empLast) {
+		this.empLast = empLast;
+	}
+
+	public String getEmpDepartment() {
+		return empDepartment;
+	}
+
+	public void setEmpDepartment(String empDepartment) {
+		this.empDepartment = empDepartment;
+	}
+
+	public String getEmpTitle() {
+		return empTitle;
+	}
+
+	public void setEmpTitle(String empTitle) {
+		this.empTitle = empTitle;
+	}
+
+	public char getEmpType() {
+		return empType;
+	}
+
+	public void setEmpType(char empType) {
+		this.empType = empType;
+	}
+
+	public double getEmpVacationHours() {
+		return empVacationHours;
+	}
+
+	public void setEmpVacationHours(double empVacationHours) {
+		this.empVacationHours = empVacationHours;
+	}
+	
+	
+}
+
+/*
+public int dateDiff(String date1, String date2) {
+	
+	System.out.println("dateDiff");
+	String newDate = "";
+	
+	try {
+		Date one = getDate(date1);
+		Date two = getDate(date2);
+		int difference = daysBetween(one, two);
+		Date date = new Date();
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.setTime(date);
+		cal.add(Calendar.DATE, difference);
+		
+		SimpleDateFormat format1 = new SimpleDateFormat("MM-dd-yyyy");
+		newDate = format1.format(cal.getTime());
+		
+		
+	}
+	catch(ParseException e) {
+		e.printStackTrace();
+	}
+	
+	
+	
+	return newDate;
+	
+}
+*/
